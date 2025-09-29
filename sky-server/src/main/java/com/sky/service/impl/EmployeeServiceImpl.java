@@ -1,7 +1,10 @@
 package com.sky.service.impl;
 
 import com.sky.constant.MessageConstant;
+import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
+import com.sky.context.BaseContext;
+import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
@@ -9,9 +12,12 @@ import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
 import com.sky.service.EmployeeService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+
+import java.time.LocalDateTime;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -39,7 +45,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         //密码比对
-        password= DigestUtils.md5DigestAsHex(password.getBytes());
+        //password= DigestUtils.md5DigestAsHex(password.getBytes());
         // TODO 后期需要进行md5加密，然后再进行比对
         if (!password.equals(employee.getPassword())) {
             //密码错误
@@ -54,5 +60,30 @@ public class EmployeeServiceImpl implements EmployeeService {
         //3、返回实体对象
         return employee;
     }
+
+    /*
+    添加员工
+     */
+    @Override
+    public void save(EmployeeDTO employeeDTO) {
+        //在进行mapper层查询的时候，还是要传入一个员工类型最好，而不是一个前端传来的数据类型
+        Employee  employee = new Employee();
+        //对象属性拷贝
+        BeanUtils.copyProperties(employeeDTO,employee);
+
+        //设置密码、状态、创建时间和更新时间、创建人和更新人
+        employee.setPassword(PasswordConstant.DEFAULT_PASSWORD);
+        employee.setStatus(StatusConstant.ENABLE);
+        employee.setCreateTime(LocalDateTime.now());
+        employee.setUpdateTime(LocalDateTime.now());
+
+        //设置创建人id和更新人id
+        //以后将创建人id和更新人id修改为动态的
+        employee.setCreateUser(BaseContext.getCurrentId());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+
+        employeeMapper.insert(employee);
+    }
+
 
 }
