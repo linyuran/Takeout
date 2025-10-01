@@ -121,5 +121,18 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     }
 
+    /**
+     * 根据id查询员工信息
+     * @param id
+     * @return
+     */
+    @Override
+    public Employee getById(Long id) {
+        Employee employee = employeeMapper.getById(id);
+        //返回给前端的数据，包含密码，可以对密码进行额外处理
+        employee.setPassword("****");
+        return employee;
+    }
+
 
 }

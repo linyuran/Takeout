@@ -35,6 +35,17 @@ public interface EmployeeMapper {
     @Options(flushCache = Options.FlushCachePolicy.TRUE)
     Page<Employee> pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
 
-
+    /**
+     * 启用和禁用员工  也可以更新员工其他信息
+     * @param employee
+     */
     void update(Employee employee);
+
+    /**
+     * 根据id查询员工
+     * @param id
+     * @return
+     */
+    @Select("select * from employee where id = #{id}")
+    Employee getById(Long id);
 }
